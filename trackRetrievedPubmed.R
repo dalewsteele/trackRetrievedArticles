@@ -6,8 +6,8 @@ setwd("~/Desktop")
 wb <-loadWorkbook("S:/task_order_04_DAA/LargeSR_diagnosis_of_acute_appendicitis/databases_for_retrieval/merged pubmed 5 mar 2014 tracking data extraction.xlsx")
 pubmed  <- readWorksheet(wb, sheet="merged_full_text_screening")
 allpubmed <- as.character(pubmed$PMID)
-
-## FIXME: detect non-english papers
+table(nchar(allpubmed))  #length of PMID
+## Detect non-english papers
 # names(pubmed)
 non_english <- str_detect(pubmed$Title, "\\[.*")
 
@@ -16,11 +16,11 @@ non_english <- str_detect(pubmed$Title, "\\[.*")
 pubmed_sharedDrive <- "S:/task_order_04_DAA/LargeSR_diagnosis_of_acute_appendicitis/PDFs/PUBMED_OCT"
 dropbox_articles <- "D:/Dropbox/Appendicitis articles"
 
-fileListsharedDrive <- list.files(pubmed_sharedDrive, pattern="[0-9]{6,8}")
-fileListDropbox <- list.files(dropbox_articles, pattern="[0-9]{6,8}")
+fileListsharedDrive <- list.files(pubmed_sharedDrive, pattern="[0-9]{5,8}")
+fileListDropbox <- list.files(dropbox_articles, pattern="[0-9]{5,8}")
 
-retrieved_sharedDrive <- str_extract(fileListsharedDrive,"[0-9]{6,8}") #extract pmid from filename
-retrieved_dropbox <- str_extract(fileListDropbox,"[0-9]{6,8}")
+retrieved_sharedDrive <- str_extract(fileListsharedDrive,"[0-9]{5,8}") #extract pmid from filename
+retrieved_dropbox <- str_extract(fileListDropbox,"[0-9]{5,8}")
 
 # How many of the retrived papers are duplicates?
 unique_retrieved_sharedDrive <- unique(retrieved_sharedDrive)
@@ -33,13 +33,19 @@ length(not_retrieved) #pmids of articles which have not been retrieved
 # Logical vector: FALSE = Not retrieved
 retrieved <- allpubmed %in% all_retrieved
 priority <- allpubmed[which(retrieved == FALSE & non_english == FALSE)]
-
+length(priority)
+non_priority <- allpubmed[which(retrieved == FALSE & non_english == TRUE)]
 ######################################################################
 ## experiment: get references directly from Entrez
 library(RefManageR)
-full_refs <- GetPubMedByID(priority, db="pubmed")
-summary(full_refs)
-full_refs
+BibOptions(check.entries = FALSE)
+trace(RefManageR:::ProcessPubMedResult, quote(res$language <- unlist(xpathApply(tdoc, "//PubmedArticle/MedlineCitation/Article/Language", 
+                                                                                xmlValue))), at =18, print = FALSE)
+english_refs <- GetPubMedByID(priority, db="pubmed")
+
+nonEnglish_refs <- GetPubMedByID(non_priority[1:10], db="pubmed")
+
+table(unlist(nonEnglish_refs$language))
 ######################################################################
 
 ## write file to desktop
@@ -53,3 +59,5 @@ writeWorksheet(wb2, priority, sheet = "sheet1", startRow = 1, startCol = 1)
 # Save workbook (this actually writes the file to disk)
 ## TODO: write an informative header
 saveWorkbook(wb2)
+
+names(pubmed)
