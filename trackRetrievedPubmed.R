@@ -35,6 +35,7 @@ retrieved <- allpubmed %in% all_retrieved
 priority <- allpubmed[which(retrieved == FALSE & non_english == FALSE)]
 length(priority)
 non_priority <- allpubmed[which(retrieved == FALSE & non_english == TRUE)]
+length(non_priority)
 ######################################################################
 ## experiment: get references directly from Entrez
 library(RefManageR)
@@ -61,3 +62,4 @@ writeWorksheet(wb2, priority, sheet = "sheet1", startRow = 1, startCol = 1)
 saveWorkbook(wb2)
 
 names(pubmed)
+pubmed[which(pubmed$extractor == "DS"), "PMID"]
