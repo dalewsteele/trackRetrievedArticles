@@ -61,6 +61,10 @@ writeWorksheet(wb2, priority, sheet = "sheet1", startRow = 1, startCol = 1)
 ## TODO: write an informative header
 saveWorkbook(wb2)
 
+<<<<<<< HEAD
 ## TODO: Use sqldf to query multiple fields including 'extractor'
+=======
+## TODO: ? use sqldf to query multiple fields
+>>>>>>> e4ebd07ffb56174b559430753b6dc7ee19d77de8
 names(pubmed)
 pubmed[which(pubmed$extractor == "DS"), "PMID"]
