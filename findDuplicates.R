@@ -1,4 +1,5 @@
 # http://www.r-bloggers.com/copying-data-from-excel-to-r-and-back/
+# Excel to clipboard, clipboard to R
 
 read.excel <- function(header=TRUE,...) {
   read.table("clipboard",sep="\t",header=TRUE,
