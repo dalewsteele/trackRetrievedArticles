@@ -81,8 +81,10 @@ studies_in_review <- unique(unlist(str_extract_all(reviews$study_pmid, "[0-9]{5,
 allpubmed <- as.character(pubmed$PMID)
 
 in_review <- allpubmed %in% studies_in_review
+colnames(in_review) <- 'identified_through_previous_reviews'
 ## FIXME: Why does excel not recognize as csv?  
 ## FIXME: How to write a column name?
+## --> generates an error: colnames(in_review) <- 'identified_through_previous_reviews'
 write.csv(in_review, file="in_review_csv", row.names=FALSE)
 ######
 names(pubmed)
