@@ -2,7 +2,8 @@ library(XLConnect)
 library(stringr)
 
 # extract list of all PMIDs in search
-setwd("~/Desktop")
+setwd("D://trackRetrievedArticles/")
+
 wb <-loadWorkbook("S:/task_order_04_DAA/LargeSR_diagnosis_of_acute_appendicitis/databases_for_retrieval/merged pubmed 5 mar 2014 tracking data extraction.xlsx")
 pubmed  <- readWorksheet(wb, sheet="merged_full_text_screening")
 allpubmed <- as.character(pubmed$PMID)
@@ -61,10 +62,28 @@ writeWorksheet(wb2, priority, sheet = "sheet1", startRow = 1, startCol = 1)
 ## TODO: write an informative header
 saveWorkbook(wb2)
 
-<<<<<<< HEAD
+
 ## TODO: Use sqldf to query multiple fields including 'extractor'
 =======
 ## TODO: Use sqldf to query multiple fields
->>>>>>> e4ebd07ffb56174b559430753b6dc7ee19d77de8
+
+
+##### Read 'SR_extraction_merged'
+## Write a logical vector if paper appears in a least one review
+wb3 <-loadWorkbook("S:\\\\task_order_04_DAA\\LargeSR_diagnosis_of_acute_appendicitis\\DRAFT_REPORT\\DATA_EXTRACTION\\SR_extraction_merged.xlsx")
+reviews  <- readWorksheet(wb3, sheet="Sheet1")
+
+## FIXME: Figure out what is causing the warnings of type "1: Error detected in cell AB593 - Incompatible type"
+# warnings() 
+
+names(reviews)
+studies_in_review <- unique(unlist(str_extract_all(reviews$study_pmid, "[0-9]{5,8}")))
+allpubmed <- as.character(pubmed$PMID)
+
+in_review <- allpubmed %in% studies_in_review
+## FIXME: Why does excel not recognize as csv?  
+## FIXME: How to write a column name?
+write.csv(in_review, file="in_review_csv", row.names=FALSE)
+######
 names(pubmed)
 pubmed[which(pubmed$extractor == "DS"), "PMID"]
