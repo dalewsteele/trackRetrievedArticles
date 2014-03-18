@@ -70,6 +70,7 @@ saveWorkbook(wb2)
 
 ##### Read 'SR_extraction_merged'
 ## Write a logical vector if paper appears in a least one review
+  
 wb3 <-loadWorkbook("S:\\\\task_order_04_DAA\\LargeSR_diagnosis_of_acute_appendicitis\\DRAFT_REPORT\\DATA_EXTRACTION\\SR_extraction_merged.xlsx")
 reviews  <- readWorksheet(wb3, sheet="Sheet1")
 
@@ -80,10 +81,9 @@ names(reviews)
 studies_in_review <- unique(unlist(str_extract_all(reviews$study_pmid, "[0-9]{5,8}")))
 allpubmed <- as.character(pubmed$PMID)
 
-in_review <- allpubmed %in% studies_in_review
+# must convert to data.frame in order to define colnames
+in_review <- as.data.frame(allpubmed %in% studies_in_review) 
 colnames(in_review) <- 'identified_through_previous_reviews'
-## FIXME: How to write a column name?
-## --> generates an error: colnames(in_review) <- 'identified_through_previous_reviews'
 
 write.csv(in_review, file="in_review.csv", row.names=FALSE)
 ######
