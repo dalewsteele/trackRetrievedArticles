@@ -37,6 +37,7 @@ priority <- allpubmed[which(retrieved == FALSE & non_english == FALSE)]
 length(priority)
 non_priority <- allpubmed[which(retrieved == FALSE & non_english == TRUE)]
 length(non_priority)
+
 ######################################################################
 ## experiment: get references directly from Entrez
 library(RefManageR)
