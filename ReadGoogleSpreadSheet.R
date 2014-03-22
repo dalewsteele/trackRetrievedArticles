@@ -3,7 +3,7 @@
 
 library(RGoogleDocs)
 
-auth = getGoogleAuth("Dale_Steele@brown.edu", "2WfLmnWT", "wise")
+auth = getGoogleAuth("Dale_Steele@brown.edu", "mypassword", "wise")
 sheets.con = getGoogleDocsConnection(auth)
 
 # http://stackoverflow.com/questions/20786901/logging-into-google-spreadsheets-with-rgoogledocs
