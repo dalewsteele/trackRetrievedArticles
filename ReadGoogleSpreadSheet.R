@@ -2,7 +2,6 @@
 # install.packages("RGoogleDocs", repos = "http://www.omegahat.org/R")
 
 library(RGoogleDocs)
-library(stringr)
 library(RMySQL)
 
 auth = getGoogleAuth("Dale_Steele@brown.edu", "mypassword", "wise")
