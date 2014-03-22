@@ -2,6 +2,8 @@
 # install.packages("RGoogleDocs", repos = "http://www.omegahat.org/R")
 
 library(RGoogleDocs)
+library(stringr)
+library(RMySQL)
 
 auth = getGoogleAuth("Dale_Steele@brown.edu", "mypassword", "wise")
 sheets.con = getGoogleDocsConnection(auth)
@@ -13,19 +15,25 @@ spreadsheets = getDocs(sheets.con,
 
 names(spreadsheets)
 sheets = getWorksheets(spreadsheets[["merged pubmed 5 mar 2014 tracking data extraction"]], sheets.con)
-names(sheets)
+names(sheets) #names of available worksheets
 
 # worksheet_as_df = sheetAsMatrix(sheets[[1]], header = TRUE, as.data.frame = TRUE, stringsAsFactors=FALSE, trim = TRUE)
-worksheet_as_df = sheetAsMatrix(sheets[["merged_full_text_screening"]], header = TRUE, as.data.frame = TRUE, stringsAsFactors=FALSE, trim = TRUE)
+mergedPubmedTracking = sheetAsMatrix(sheets[["merged_full_text_screening"]], header = TRUE, as.data.frame = TRUE, stringsAsFactors=FALSE, trim = TRUE)
 
 # Use sheet!
-names(worksheet_as_df)
-str(worksheet_as_df)
-worksheet_as_df[,1]
-as.numeric(worksheet_as_df[,6])
-dim(worksheet_as_df)
-str(worksheet_as_df)
-study_pmid <- as.numeric(worksheet_as_df[,6])
-study_pmid
-unique(study_pmid)
+names(mergedPubmedTracking)
+str(mergedPubmedTracking)
+
+## FIXME: create a password file
+con = dbConnect(MySQL(), user='root', password='passwd', dbname='appy')
+dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
+dbListTables(con)
+query <- function(...) dbGetQuery(con, ...) #simplify queries
+
+DWSextract <- query("SELECT extractor, Authors, PMID, Year, test_type, test_performance,test_performance_status,harms,harms_status,other_outcomes,other_outcomes_status FROM trackingfile WHERE include_ = 'yes' AND identified_through_previous_reviews='FALSE' AND extractor='DS'")
+head(DWSextract)
+
+write.csv(DWSextract, file="DWSextract.csv", row.names=FALSE)
+dbDisconnect(con)
+
 
