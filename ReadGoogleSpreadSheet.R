@@ -12,15 +12,14 @@ sheets.con = getGoogleDocsConnection(auth)
 # http://stackoverflow.com/questions/20786901/logging-into-google-spreadsheets-with-rgoogledocs
 # spreadsheets = getDocs(sheets.con, ssl.verifypeer=FALSE)
 # get available spreadsheets
-spreadsheets = getDocs(sheets.con,
-                      cainfo=system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+spreadsheets = getDocs(sheets.con, cainfo=system.file("CurlSSL", "cacert.pem", package = "RCurl"))
 
 names(spreadsheets)
 sheets = getWorksheets(spreadsheets[["merged pubmed 5 mar 2014 tracking data extraction"]], sheets.con)
 names(sheets) #names of available worksheets
 
 mergedPubmedTracking = sheetAsMatrix(sheets[["merged_full_text_screening"]], header = TRUE, as.data.frame = TRUE, stringsAsFactors=FALSE, trim = TRUE)
-mergedPubmedTracking$Year
+
 # Use sheet!
 names(mergedPubmedTracking)
 # Convert numeric 'year' to integer 'year'
