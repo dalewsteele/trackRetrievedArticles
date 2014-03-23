@@ -28,11 +28,13 @@ names(mergedPubmedTracking)
 mergedPubmedTracking$Year  <- as.integer(mergedPubmedTracking$Year)
 mergedPubmedTracking$Year
 
-## FIXME: create a password file
-con = dbConnect(MySQL(), user='root', password='rootPassword', dbname='appy')
-dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
+## requires a C://my.cnf with username and password
+con = dbConnect(MySQL(), dbname='appy')
 dbListTables(con)
-query <- function(...) dbGetQuery(con, ...) #simplify queries
+dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
+
+# a function to simplify queries
+query <- function(...) dbGetQuery(con, ...) 
 
 DWSextract <- query("SELECT extractor, Authors, PMID, Year, test_type, test_performance,test_performance_status,harms,harms_status,other_outcomes,other_outcomes_status FROM trackingfile WHERE include_ = 'yes' AND identified_through_previous_reviews='FALSE' AND extractor='DS'")
 DWSdone <- query("SELECT extractor, PMID, Year, test_type, test_performance,test_performance_status FROM trackingfile WHERE include_ = 'yes' AND identified_through_previous_reviews='FALSE' AND extractor='DS' AND test_performance='yes'")
