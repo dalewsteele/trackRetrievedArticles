@@ -8,12 +8,18 @@ read.excel <- function(header=TRUE,...) {
 
 (copiedPMID=read.excel())
 
+## HACK to re-assign studies to Lori
+toLD <- copiedPMID[,1]
+str(toLD)
+PMID <- as.integer(mergedPubmedTracking$PMID) #all PMID
+str(PMID)
 
-duplicatedPMID <- duplicated(copiedPMID)
-
+toCHANGE  <- PMID %in% toLD
+mergedPubmedTracking$extractor[which(toCHANGE)]  <-'LD'
+mergedPubmedTracking$extractor
 
 write.excel <- function(x,row.names=FALSE,col.names=FALSE,...) {
   write.table(x,"clipboard",sep="\t",row.names=row.names,col.names=col.names,...)
 }
 
-write.excel(duplicatedPMID)
+write.excel(mergedPubmedTracking$extractor)
