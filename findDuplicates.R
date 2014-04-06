@@ -1,12 +1,12 @@
 # http://www.r-bloggers.com/copying-data-from-excel-to-r-and-back/
 # Excel to clipboard, clipboard to R
 
-read.excel <- function(header=TRUE,...) {
+clipToRobject <- function(header=TRUE,...) {
   read.table("clipboard",sep="\t",header=TRUE,
              na.strings="", blank.lines.skip=FALSE, ...)
 }
 
-(copiedPMID=read.excel())
+(copiedPMID=clipToRobject())
 extracted <- unique(copiedPMID)
 setwd("~/Desktop")
 write.csv(extracted, file="extracted.csv")
@@ -21,8 +21,8 @@ toCHANGE  <- PMID %in% toLD
 mergedPubmedTracking$extractor[which(toCHANGE)]  <-'LD'
 mergedPubmedTracking$extractor
 
-write.excel <- function(x,row.names=FALSE,col.names=FALSE,...) {
+objectToClip <- function(x,row.names=FALSE,col.names=TRUE,...) {
   write.table(x,"clipboard",append=FALSE, sep="\t",row.names=row.names,col.names=col.names,...)
 }
 
-write.excel(extracted)
+objectToClip(extracted)
