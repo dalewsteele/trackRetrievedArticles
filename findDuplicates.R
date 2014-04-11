@@ -10,7 +10,7 @@ clipToRobject <- function(header=TRUE,...) {
 extracted <- unique(copiedPMID)
 setwd("~/Desktop")
 write.csv(extracted, file="extracted.csv", append=FALSE)
-?write.csv
+
 
 ## HACK to re-assign studies to Lori
 toLD <- copiedPMID[,1]
