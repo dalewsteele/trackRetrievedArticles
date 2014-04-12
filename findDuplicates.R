@@ -6,8 +6,14 @@ clipToRobject <- function(header=TRUE,...) {
              na.strings="", blank.lines.skip=FALSE, ...)
 }
 
+objectToClip <- function(x,row.names=FALSE,col.names=TRUE,...) {
+  write.table(x,"clipboard",append=FALSE, sep="\t",row.names=row.names,col.names=col.names,...)
+}
+
 (copiedPMID=clipToRobject())
 extracted <- unique(copiedPMID)
+bias <- clipToRobject()
+cbind(extracted$study_pmid, bias$study_pmid)
 setwd("~/Desktop")
 write.csv(extracted, file="extracted.csv", append=FALSE)
 
@@ -21,9 +27,4 @@ str(PMID)
 toCHANGE  <- PMID %in% toLD
 mergedPubmedTracking$extractor[which(toCHANGE)]  <-'LD'
 mergedPubmedTracking$extractor
-
-objectToClip <- function(x,row.names=FALSE,col.names=TRUE,...) {
-  write.table(x,"clipboard",append=FALSE, sep="\t",row.names=row.names,col.names=col.names,...)
-}
-
-objectToClip(extracted)
+##
