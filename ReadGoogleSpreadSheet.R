@@ -25,7 +25,7 @@ names(mergedPubmedTracking)
 # Convert numeric 'year' to integer 'year'
 ## FIXME:  work-around creation of NA's 
 mergedPubmedTracking$Year  <- as.integer(mergedPubmedTracking$Year)
-mergedPubmedTracking$Year
+mergedPubmedTracking$extractor
 
 ## requires a C://my.cnf with username and password
 con = dbConnect(MySQL(), dbname='appy')
@@ -35,12 +35,15 @@ dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
 # a function to simplify queries
 query <- function(...) dbGetQuery(con, ...) 
 
-DWSextract <- query("SELECT extractor, Authors, PMID, Year, test_type, test_performance,test_performance_status,harms,harms_status,other_outcomes,other_outcomes_status FROM trackingfile WHERE include_ = 'yes' AND identified_through_previous_reviews='FALSE' AND extractor='DS'")
-DWSdone <- query("SELECT extractor, PMID, Year, test_type, test_performance,test_performance_status FROM trackingfile WHERE include_ = 'yes' AND identified_through_previous_reviews='FALSE' AND extractor='DS' AND test_performance='yes'")
-DWSdone
+scores <- query("SELECt PMID, test_type FROM trackingfile WHERE include_ = 'yes'AND test_type LIKE '%score%'")
+      
 
+DWSextracted <- query("SELECT extractor, PMID FROM trackingfile WHERE
+                        extractor='DW' AND test_performance='yes' AND test_performance_status='done'")
 
-write.csv(DWSextract, file="DWSextract.csv", row.names=FALSE)
+    
+write.csv(DWSextracted, file="DWSextract.csv", row.names=FALSE)
+write.csv(scores, file="scores.csv", row.names=FALSE)
 dbDisconnect(con)
 
 
