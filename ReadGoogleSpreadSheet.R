@@ -26,6 +26,8 @@ names(mergedPubmedTracking)
 ## FIXME:  work-around creation of NA's 
 mergedPubmedTracking$Year  <- as.integer(mergedPubmedTracking$Year)
 mergedPubmedTracking$extractor
+names(mergedPubmedTracking)
+
 
 ## requires a C://my.cnf with username and password
 con = dbConnect(MySQL(), dbname='appy')
@@ -35,11 +37,15 @@ dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
 # a function to simplify queries
 query <- function(...) dbGetQuery(con, ...) 
 
-scores <- query("SELECt PMID, test_type FROM trackingfile WHERE include_ = 'yes'AND test_type LIKE '%score%'")
-      
+scores <- query("SELECt PMID, Title, Authors, Year,ShortDetails, test_type FROM trackingfile WHERE include_ = 'yes'AND test_type LIKE '%score%'
+                OR test_type LIKE '%classifier%' OR test_type LIKE '%strategy%'")
+scores  
+
+  
 
 DWSextracted <- query("SELECT extractor, PMID FROM trackingfile WHERE
-                        extractor='DW' AND test_performance='yes' AND test_performance_status='done'")
+                        extractor='DS' AND test_performance='yes' AND test_performance_status='done'")
+
 
     
 write.csv(DWSextracted, file="DWSextract.csv", row.names=FALSE)
