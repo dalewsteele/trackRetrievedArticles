@@ -35,21 +35,25 @@ dbListTables(con)
 dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
 
 # a function to simplify queries
+
 query <- function(...) dbGetQuery(con, ...) 
 
 scores <- query("SELECt PMID, Title, Authors, Year,ShortDetails, test_type FROM trackingfile WHERE include_ = 'yes'AND test_type LIKE '%score%'
                 OR test_type LIKE '%classifier%' OR test_type LIKE '%strategy%'")
 scores  
-
+write.csv(scores, file="scores.csv", row.names=FALSE)
   
 
 DWSextracted <- query("SELECT extractor, PMID FROM trackingfile WHERE
-                        extractor='DS' AND test_performance='yes' AND test_performance_status='done'")
-
-
-    
+                        extractor='DS' AND test_performance='yes' AND test_performance_status='done'")   
 write.csv(DWSextracted, file="DWSextract.csv", row.names=FALSE)
-write.csv(scores, file="scores.csv", row.names=FALSE)
+
+
+toExtract <- query("SELECT extractor, PMID, test_type, test_performance FROM trackingfile WHERE
+              extractor IS NOT NULL AND test_performance IS NULL AND (test_type LIKE '%CT%' OR test_type LIKE
+              '%US%' OR test_type LIKE '%LAB%' OR test_type LIKE '%signs_symptoms%')")
+toExtract
+
 dbDisconnect(con)
 
 
