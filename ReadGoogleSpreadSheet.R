@@ -29,13 +29,22 @@ str(mergedPubmedTracking)
 
 ## FIXME: "1999.0" --> regex first date string --> as.date
 require(stringr)
-?str_replace
+year.orig <- mergedPubmedTracking$Year[1:10]
+year.clean <- str_replace(year.orig, ".0", "")
+year.clean
+
+
 mergedPubmedTracking$Year  <- 
 mergedPubmedTracking$extractor
 names(mergedPubmedTracking)
 
 
 ## requires a C://my.cnf with username and password
+## $mysql
+## create database appy;
+
+con = dbConnect(MySQL())
+str(con)
 con = dbConnect(MySQL(), dbname='appy')
 dbListTables(con)
 dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
