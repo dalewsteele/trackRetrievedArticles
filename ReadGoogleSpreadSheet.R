@@ -12,7 +12,10 @@ sheets.con = getGoogleDocsConnection(auth)
 # http://stackoverflow.com/questions/20786901/logging-into-google-spreadsheets-with-rgoogledocs
 # spreadsheets = getDocs(sheets.con, ssl.verifypeer=FALSE)
 # get available spreadsheets
-spreadsheets = getDocs(sheets.con, cainfo=system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+
+# TODO (line below works on Windows)
+# spreadsheets = getDocs(sheets.con, cainfo=system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+spreadsheets = getDocs(sheets.con, ssl.verifypeer=FALSE)
 
 names(spreadsheets)
 sheets = getWorksheets(spreadsheets[["merged pubmed 5 mar 2014 tracking data extraction"]], sheets.con)
@@ -22,9 +25,12 @@ mergedPubmedTracking = sheetAsMatrix(sheets[["merged_full_text_screening"]], hea
 
 # Use sheet!
 names(mergedPubmedTracking)
-# Convert numeric 'year' to integer 'year'
-## FIXME:  work-around creation of NA's 
-mergedPubmedTracking$Year  <- as.integer(mergedPubmedTracking$Year)
+str(mergedPubmedTracking)
+
+## FIXME: "1999.0" --> regex first date string --> as.date
+require(stringr)
+?str_replace
+mergedPubmedTracking$Year  <- 
 mergedPubmedTracking$extractor
 names(mergedPubmedTracking)
 
