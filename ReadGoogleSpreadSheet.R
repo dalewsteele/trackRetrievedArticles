@@ -51,12 +51,13 @@ dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
 
 query <- function(...) dbGetQuery(con, ...) 
 
-scores <- query("SELECt PMID, Title, Authors, Year, test_performance_status, test_type FROM trackingfile WHERE
+scores <- query("SELECt PMID, Title, Authors, Year, extractor, test_performance_status, test_type FROM trackingfile WHERE
                 include_ = 'yes'AND test_type LIKE '%score%'")
 
 scores <- query("SELECt PMID, Title, Authors, Year,ShortDetails, test_type FROM trackingfile WHERE
                 include_ = 'yes'AND test_type='score'")
 onlyScores
+
 write.csv(scores, file="scores.csv", row.names=FALSE)
   
 
