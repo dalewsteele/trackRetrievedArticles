@@ -24,7 +24,7 @@ tbt <- function(N, npos, oc, ...){
         }
 
 
-## Look through rows of matrix by score
+## Look through rows of mat=[cutpoint, sens, spec] by score
 mtbt  <- function(N, npos, mat, ...){
         tbtmat <- matrix(nrow=nrow(mat), ncol=5)
         colnames(tbtmat) <- c("cutpoint", "TP", "FN", "FP", "TN")
