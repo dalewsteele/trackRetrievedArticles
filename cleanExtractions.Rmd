@@ -25,7 +25,6 @@ scores  <- readWorksheet(wb, sheet=getSheets(wb)[1])
 The scores file has been read into an R data.frame 'scores'
 
 ```{r}
-scores$definition_of_a_positive_test
 cutpoints <- str_replace(scores$definition_of_a_positive_test, ">=", "")
 cutpoints <- str_trim(cutpoints, side = "both")
 
