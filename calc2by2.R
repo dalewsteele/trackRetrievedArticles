@@ -35,11 +35,12 @@ mtbt  <- function(N, npos, mat, ...){
         return(tbtmat)
         }
 
-PMID_18534219 <- mtbt(849, 123, mymat)
+mymat <- as.matrix(clipToRobject())
+mymat
+(tables <-  mtbt(360,293 , mymat))
+objectToClip(tables)
 
-(PMID_23623557  <- mtbt(261,53, mymat))
-(PMID_21521827 <- mtbt(594, 306, mymat))
-objectToClip(PMID_21521827)
+
 
 ### A function to convert cutpoint Dpos Dneg to 2x2 tables
 counts.tbt <- function(counts){
@@ -60,7 +61,7 @@ mymat <- as.matrix(clipToRobject())
 mymat
 
 objectToClip(counts.tbt(mymat))
-Alvarado.tbt(mymat)
+counts.tbt(mymat)
 
 
 

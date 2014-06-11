@@ -1,0 +1,41 @@
+---
+title: Cleanup Score Extractions
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(XLConnect)
+library(stringr)
+```
+
+Read the Excel file (from copy initially)
+
+```{r}
+setwd("D://trackRetrievedArticles/")
+## NB list sheets: http://stackoverflow.com/questions/12945687/how-to-read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frame-e
+
+wb <-loadWorkbook("scores_extraction.xlsx")
+scores  <- readWorksheet(wb, sheet=getSheets(wb)[1])
+```
+
+The scores file has been read into an R data.frame 'scores'
+
+```{r}
+scores$definition_of_a_positive_test
+cutpoints <- str_replace(scores$definition_of_a_positive_test, ">=", "")
+str_trim(cutpoints, side = "both")
+
+## TODO: replace multiple patterns using "|"?
+cutpoints <- str_replace_all(scores$definition_of_a_positive_test, "[a-zA-Z]| >= | \\.", "")
+cutpoints
+write.csv(cbind(scores$definition_of_a_positive_test, cutpoints), file="scoresTest.csv")
+```
+
+
+
+
+

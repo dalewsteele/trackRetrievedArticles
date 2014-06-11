@@ -11,6 +11,7 @@ objectToClip <- function(x,row.names=FALSE,col.names=TRUE,...) {
 }
 
 (copiedPMID=clipToRobject())
+
 extracted <- unique(copiedPMID)
 bias <- clipToRobject()
 cbind(extracted$study_pmid, bias$study_pmid)

@@ -4,18 +4,18 @@
 library(RGoogleDocs)
 library(RMySQL)
 
+
 ## add options (as below) to a project specific .Rprofile
 #  options(GoogleDocsPassword = c("GoogleUserName"="password"))
 auth = getGoogleAuth(service="wise")
 sheets.con = getGoogleDocsConnection(auth)
 
-# http://stackoverflow.com/questions/20786901/logging-into-google-spreadsheets-with-rgoogledocs
-# spreadsheets = getDocs(sheets.con, ssl.verifypeer=FALSE)
 # get available spreadsheets
+# http://stackoverflow.com/questions/20786901/logging-into-google-spreadsheets-with-rgoogledocs
 
 # TODO (line below works on Windows)
-# spreadsheets = getDocs(sheets.con, cainfo=system.file("CurlSSL", "cacert.pem", package = "RCurl"))
-spreadsheets = getDocs(sheets.con, ssl.verifypeer=FALSE)
+spreadsheets = getDocs(sheets.con, cainfo=system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+# spreadsheets = getDocs(sheets.con, ssl.verifypeer=FALSE) #works on Linux
 
 names(spreadsheets)
 sheets = getWorksheets(spreadsheets[["merged pubmed 5 mar 2014 tracking data extraction"]], sheets.con)
@@ -25,24 +25,26 @@ mergedPubmedTracking = sheetAsMatrix(sheets[["merged_full_text_screening"]], hea
 
 # Use sheet!
 names(mergedPubmedTracking)
-str(mergedPubmedTracking)
+
+## Allows left join, keeping order
+# library(plyr)
+# newdf <- join(mergedPubmedTracking, copiedPMID)
+
 
 ## FIXME: "1999.0" --> regex first date string --> as.date
 require(stringr)
-year.orig <- mergedPubmedTracking$Year[1:10]
-year.clean <- str_replace(year.orig, ".0", "")
+year.orig <- mergedPubmedTracking$Year
+year.orig
+year.clean <- str_replace(year.orig, "\\.0", "")
 year.clean
 
-
-mergedPubmedTracking$Year  <- 
-mergedPubmedTracking$extractor
-names(mergedPubmedTracking)
+# 
 
 
 ## requires a C://my.cnf with username and password
 ## $mysql
 ## create database appy;
-
+date()
 con = dbConnect(MySQL(), dbname='appy')
 dbListTables(con)
 dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
@@ -51,18 +53,28 @@ dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
 
 query <- function(...) dbGetQuery(con, ...) 
 
-scores <- query("SELECt PMID, Title, Authors, Year, extractor, test_performance_status, test_type FROM trackingfile WHERE
-                include_ = 'yes'AND test_type LIKE '%score%'")
+# all with any score
+scores <- query("SELECt PMID, Title, Authors, Year, extractor, test_performance_status, test_type, score FROM trackingfile WHERE
+                include_ = 'yes'AND test_type LIKE '%score%' ORDER by extractor, test_performance_status")
 
-scores <- query("SELECt PMID, Title, Authors, Year,ShortDetails, test_type FROM trackingfile WHERE
-                include_ = 'yes'AND test_type='score'")
-onlyScores
+write.csv(scores, file="scores_status.csv", row.names=FALSE)
 
-write.csv(scores, file="scores.csv", row.names=FALSE)
-  
+scoreOnly <- query("SELECt PMID, extractor, test_performance_status, test_type, score FROM trackingfile WHERE
+                include_ = 'yes'AND test_type = 'score'")
+dim(scoreOnly)
 
-DWSextracted <- query("SELECT extractor, PMID FROM trackingfile WHERE
-                        extractor='DS' AND test_performance='yes' AND test_performance_status='done'")   
+AlvaradoScoreOnly <- query("SELECt PMID, extractor, test_performance_status, test_type, score FROM trackingfile WHERE
+                include_ = 'yes'AND test_type = 'score' AND score LIKE '%Alvarado%'")
+AlvaradoScoreOnly
+write.csv(AlvaradoScoreOnly, file="AlvaradoScoreOnly.csv", row.names=FALSE)
+
+## Find records in above where score is listed in 'test_type', but 'score' = NA
+scores[scores$score == "NA",c("PMID", "test_type", "score")]
+
+DWSextracted <- query("SELECT PMID FROM trackingfile WHERE
+                        extractor='DS' AND test_type LIKE '%score%' AND test_performance='yes' AND test_performance_status='done'")   
+
+DWSextracted
 write.csv(DWSextracted, file="DWSextract.csv", row.names=FALSE)
 
 
