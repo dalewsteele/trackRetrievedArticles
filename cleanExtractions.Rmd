@@ -27,11 +27,11 @@ The scores file has been read into an R data.frame 'scores'
 ```{r}
 scores$definition_of_a_positive_test
 cutpoints <- str_replace(scores$definition_of_a_positive_test, ">=", "")
-str_trim(cutpoints, side = "both")
+cutpoints <- str_trim(cutpoints, side = "both")
 
 ## TODO: replace multiple patterns using "|"?
 cutpoints <- str_replace_all(scores$definition_of_a_positive_test, "[a-zA-Z]| >= | \\.", "")
-cutpoints
+
 write.csv(cbind(scores$definition_of_a_positive_test, cutpoints), file="scoresTest.csv")
 ```
 
