@@ -59,7 +59,6 @@ scores <- query("SELECt PMID, Title, Authors, Year, extractor, test_performance_
 
 tail(scores[c("PMID", "score")])
 
-write.csv(scores, file="scores_status.csv", row.names=FALSE)
 
 scoreOnly <- query("SELECt PMID, extractor, test_performance_status, test_type, score FROM trackingfile WHERE
                 include_ = 'yes'AND test_type = 'score'")
@@ -70,20 +69,14 @@ AlvaradoScoreOnly <- query("SELECt PMID, extractor, test_performance_status, tes
 AlvaradoScoreOnly
 write.csv(AlvaradoScoreOnly, file="AlvaradoScoreOnly.csv", row.names=FALSE)
 
-## Find records in above where score is listed in 'test_type', but 'score' = NA
-scores[scores$score == "NA",c("PMID", "test_type", "score")]
 
-DWSextracted <- query("SELECT PMID FROM trackingfile WHERE
-                        extractor='DS' AND test_type LIKE '%score%' AND test_performance='yes' AND test_performance_status='done'")   
 
-DWSextracted
-write.csv(DWSextracted, file="DWSextract.csv", row.names=FALSE)
 
 
 toExtract <- query("SELECT extractor, PMID, test_type, test_performance FROM trackingfile WHERE
               extractor IS NOT NULL AND test_performance IS NULL AND (test_type LIKE '%CT%' OR test_type LIKE
               '%US%' OR test_type LIKE '%LAB%' OR test_type LIKE '%signs_symptoms%')")
-toExtract
+
 
 dbDisconnect(con)
 
