@@ -55,7 +55,9 @@ query <- function(...) dbGetQuery(con, ...)
 
 # all with any score
 scores <- query("SELECt PMID, Title, Authors, Year, extractor, test_performance_status, test_type, score FROM trackingfile WHERE
-                include_ = 'yes'AND test_type LIKE '%score%' ORDER by extractor, test_performance_status")
+                include_ = 'yes' AND test_performance = 'yes' AND test_type LIKE '%score%' ORDER by extractor, test_performance_status")
+
+tail(scores[c("PMID", "score")])
 
 write.csv(scores, file="scores_status.csv", row.names=FALSE)
 

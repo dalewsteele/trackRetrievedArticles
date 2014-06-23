@@ -3,9 +3,6 @@ title: Cleanup Score Extractions
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
 library(XLConnect)
@@ -13,18 +10,58 @@ library(stringr)
 ```
 
 Read the Excel file (from copy initially)
+Connect to local MySQL server and read scores from tracking file.
 
 ```{r}
-setwd("D://trackRetrievedArticles/")
-## NB list sheets: http://stackoverflow.com/questions/12945687/how-to-read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frame-e
+library(RMySQL)
+con = dbConnect(MySQL(), dbname='appy')
+dbListTables(con)
+dbWriteTable(con,"trackingFile",mergedPubmedTracking,overwrite=T)
 
-wb <-loadWorkbook("scores_extraction.xlsx")
-scores  <- readWorksheet(wb, sheet=getSheets(wb)[1])
+# a function to simplify queries
+
+query <- function(...) dbGetQuery(con, ...) 
+
+# all with any score
+scores_tracking <- query("SELECt PMID, Title, Authors, Year, extractor, test_performance_status,
+                test_type, score FROM trackingfile WHERE include_ = 'yes' AND test_performance = 'yes' 
+                AND test_type LIKE '%score%' ORDER by extractor, test_performance_status")
+
+pmid_scores_tracking <- query("SELECt PMID FROM trackingfile WHERE include_ = 'yes' AND test_performance = 'yes' 
+                               AND test_type LIKE '%score%'")
+pmid_score_tracking <- pmid_scores_tracking$PMID
+pmid_score_tracking
 ```
 
-The scores file has been read into an R data.frame 'scores'
 
 ```{r}
+## NB list sheets: http://stackoverflow.com/questions/12945687/how-to-read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frame-e
+
+wb <-loadWorkbook("C:/Users/dsteele/Desktop/scores_extraction_6-23-2014.xlsx")
+score_extracts  <- readWorksheet(wb, sheet=getSheets(wb)[1])
+pmid_score_extracts <- score_extracts$study_pmid
+pmid_score_extracted_papers <- as.numeric(unique(score_extracts$study_pmid))
+pmid_score_extracted_papers
+pmid_score_extracted_papers[c(72,73)]
+
+```
+
+The scores file has been read into an R data.frame 'scores_extracts' from the local copy
+
+How many unique papers are there which have extracted scores?
+Which papers have been extracted, but are not indicated as such in tracking file?
+
+```{r}
+
+setdiff(pmid_score_extracted_papers, pmid_score_tracking)
+setdiff(pmid_score_tracking, pmid_score_extracted_papers)
+?setdiff
+
+```
+
+
+```{r}
+## TODO: regular expressions to clean extraction file
 cutpoints <- str_replace(scores$definition_of_a_positive_test, ">=", "")
 cutpoints <- str_trim(cutpoints, side = "both")
 
