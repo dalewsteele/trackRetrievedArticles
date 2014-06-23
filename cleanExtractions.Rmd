@@ -9,8 +9,8 @@ library(XLConnect)
 library(stringr)
 ```
 
-Read the Excel file (from copy initially)
 Connect to local MySQL server and read scores from tracking file.
+Read the Excel file (from dropbox copy)
 
 ```{r}
 library(RMySQL)
@@ -29,20 +29,18 @@ pmid_score_tracking <- pmid_scores_tracking$PMID
 pmid_score_tracking
 ```
 
+Read the scores_extraction worksheet into R (from Dropbox copy)
 
 ```{r}
 ## NB list sheets: http://stackoverflow.com/questions/12945687/how-to-read-all-worksheets-in-an-excel-workbook-into-an-r-list-with-data-frame-e
 
-wb <-loadWorkbook("C:/Users/dsteele/Desktop/scores_extraction_6-23-2014.xlsx")
-score_extracts  <- readWorksheet(wb, sheet=getSheets(wb)[1])
-pmid_score_extracts <- score_extracts$study_pmid
-pmid_score_extracted_papers <- as.numeric(unique(score_extracts$study_pmid))
-pmid_score_extracted_papers
-pmid_score_extracted_papers[c(72,73)]
+wb <- loadWorkbook("D:/Dropbox/BrownCEBM/Appendicitis/scores_extraction_6-23-2014.xlsx")
+scoredat  <- readWorksheet(wb, sheet=getSheets(wb)[1])
+pmid_score_extracts <- scoredat$study_pmid
+pmid_score_extracted_papers <- as.numeric(unique(scoredat$study_pmid))
 
+names(scoredat)
 ```
-
-The scores file has been read into an R data.frame 'scores_extracts' from the local copy
 
 How many unique papers are there which have extracted scores?
 Which papers have been extracted, but are not indicated as such in tracking file?
@@ -56,6 +54,7 @@ setdiff(pmid_score_tracking, pmid_score_extracted_papers)
 ```
 
 Which papers containing 'score' have include_ = 'no?' OR test_performance='no'
+
 ```{r}
 (pmid_scores_out <- query("SELECt PMID FROM trackingfile WHERE include_ = 'no?' AND test_type LIKE '%score%'"))
 (pmid_scores_noTP  <- query("SELECt PMID FROM trackingfile WHERE test_performance = 'no?' 
@@ -63,15 +62,21 @@ Which papers containing 'score' have include_ = 'no?' OR test_performance='no'
 
 ```
 
+Use regular expressions to clean, harmonize and create dummy variables for analysis.
+
+
 ```{r}
-## TODO: regular expressions to clean extraction file
-cutpoints <- str_replace(scores$definition_of_a_positive_test, ">=", "")
-cutpoints <- str_trim(cutpoints, side = "both")
+wb <- loadWorkbook("D:/Dropbox/BrownCEBM/Appendicitis/scores_extraction_6-23-2014.xlsx")
+scoredat  <- readWorksheet(wb, sheet=getSheets(wb)[1])
+names(scoredat)
+library(stringr)
+cutPoint <- str_trim(str_replace(str_replace(scoredat$definition_of_a_positive_test, ">=", ""),
+                                 "score", ""), side="both")
 
-## TODO: replace multiple patterns using "|"?
-cutpoints <- str_replace_all(scores$definition_of_a_positive_test, "[a-zA-Z]| >= | \\.", "")
+scoreName <- str_trim(str_replace(scoredat$test, "score|scoring system", ""), side="both")
+scoreName
 
-write.csv(cbind(scores$definition_of_a_positive_test, cutpoints), file="scoresTest.csv")
+table(scoredat$Population)
 ```
 
 
