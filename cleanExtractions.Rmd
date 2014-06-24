@@ -40,6 +40,7 @@ pmid_score_extracts <- scoredat$study_pmid
 pmid_score_extracted_papers <- as.numeric(unique(scoredat$study_pmid))
 
 names(scoredat)
+scoredat$source_pmid[scoredat$test == 'Ramirez']
 ```
 
 How many unique papers are there which have extracted scores?
