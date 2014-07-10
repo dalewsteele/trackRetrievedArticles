@@ -37,7 +37,7 @@ mtbt  <- function(N, npos, mat, ...){
 
 mymat <- as.matrix(clipToRobject())
 mymat
-(tables <-  mtbt(150,51 , mymat))
+(tables <-  mtbt(192,101 , mymat))
 objectToClip(tables)
 
 
